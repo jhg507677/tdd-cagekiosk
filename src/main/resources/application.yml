@@ -1,0 +1,54 @@
+#http://localhost:8080/h2-console
+spring:
+  profiles:
+    default: local
+
+  datasource:
+    url: jdbc:h2:mem:sample
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # 실제 서버 운영단에는 반드시 앱유저 권한을 별도로 분리해서 REVOKE ALTER, DROP, CREATE ON *.* FROM app_user; 이걸 해줘야함
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true # Hibernate 초기화 이후 data.sql 실행
+
+  h2:
+    console:
+      enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+
+  sql:
+    init:
+      mode: never
