@@ -1,6 +1,9 @@
 package com.codingcat.cafekiosk.domain.product;
 
+import static com.codingcat.cafekiosk.domain.product.ProductSellingStatus.SELLING;
+
 import com.codingcat.cafekiosk.domain.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -38,6 +41,8 @@ public class Product extends BaseEntity {
 
   private String name;
   private int price;
+
+
 
   @Builder
   public Product(

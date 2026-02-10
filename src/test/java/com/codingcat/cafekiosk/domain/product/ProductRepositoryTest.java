@@ -2,6 +2,7 @@ package com.codingcat.cafekiosk.domain.product;
 
 import static com.codingcat.cafekiosk.domain.product.ProductSellingStatus.HOLD;
 import static com.codingcat.cafekiosk.domain.product.ProductSellingStatus.SELLING;
+import static com.codingcat.cafekiosk.domain.product.ProductSellingStatus.STOP_SELLING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
@@ -45,7 +46,7 @@ class ProductRepositoryTest {
     Product product3 = Product.builder()
       .productNumber("003")
       .type(ProductType.HANDMADE)
-      .sellingStatus(ProductSellingStatus.STOP_SELLING)
+      .sellingStatus(STOP_SELLING)
       .name("팥빙수")
       .price(7000)
       .build();
@@ -85,7 +86,7 @@ class ProductRepositoryTest {
     Product product3 = Product.builder()
       .productNumber("003")
       .type(ProductType.HANDMADE)
-      .sellingStatus(ProductSellingStatus.STOP_SELLING)
+      .sellingStatus(STOP_SELLING)
       .name("팥빙수")
       .price(7000)
       .build();
@@ -103,5 +104,45 @@ class ProductRepositoryTest {
         tuple("아메리카노", 4000),
         tuple("카페라떼", 4500)
       );
+  }
+
+
+  @DisplayName("================ 가장 마지막 상품 번호를 가져온다 ================ ")
+  @Test
+  void test(){
+    // given
+    Product product1 = createProduct("001", ProductType.HANDMADE, SELLING, "아메리카노", 4000);
+    Product product2 = createProduct("002", ProductType.HANDMADE, HOLD, "카페라떼", 4500);
+    Product product3 = createProduct("003", ProductType.HANDMADE, STOP_SELLING, "팥빙수", 7000);
+    productRepository.saveAll(List.of(product1, product2, product3));
+
+    // when
+    String result = productRepository.findLatestProductNumber();
+
+    // then
+    assertThat(result).isEqualTo("003");
+  }
+
+  @DisplayName("================ 가장 마지막 상품 번호를 가져올 때 상품이 하나도 없는 경우 null을 반환한다. ================ ")
+  @Test
+  void findLatestProductNumberWhenProductIsEmpty(){
+    // when
+    String result = productRepository.findLatestProductNumber();
+
+    // then
+    assertThat(result).isNull();
+  }
+
+  public Product createProduct(
+    String productNumber, ProductType type, ProductSellingStatus sellingStatus, String name,
+    int price
+  ){
+    return Product.builder()
+      .productNumber(productNumber)
+      .type(type)
+      .sellingStatus(sellingStatus)
+      .name(name)
+      .price(price)
+      .build();
   }
 }

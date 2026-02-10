@@ -6,78 +6,105 @@ import com.codingcat.cafekiosk.domain.order.Order;
 import com.codingcat.cafekiosk.domain.order.OrderRepository;
 import com.codingcat.cafekiosk.domain.product.Product;
 import com.codingcat.cafekiosk.domain.product.ProductRepository;
+import com.codingcat.cafekiosk.domain.product.ProductType;
+import com.codingcat.cafekiosk.domain.stock.Stock;
+import com.codingcat.cafekiosk.domain.stock.StockRepository;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderService {
   private final ProductRepository productRepository;
   private final OrderRepository orderRepository;
+  private final StockRepository stockRepository;
 
-  // 상품 주문
   public OrderResponse createOrder(
     OrderCreateRequest request, LocalDateTime registeredDateTime
   ) {
-    // 상품 가져오기
-    List<String> requestProductNumbers = request.getProductNumbers();
+    List<String> requestProducts = request.getProductNumbers();
 
-    // DB에서 상품 조회
-    List<Product> dbProducts = productRepository.findAllByProductNumberIn(requestProductNumbers);
+    // 1. 상품 조회
+    List<Product> products = findProductsBy(requestProducts);
 
-    List<Product> orderedProducts = findProductByDuplicateProductNumber(
-      dbProducts, requestProductNumbers);
+    // 2. 재고 차감
+    deductStockQuantities(products);
 
-    Order order = Order.create(orderedProducts, registeredDateTime);
+    // 3. 주문 생성
+    Order order = Order.create(products, registeredDateTime);
     Order savedOrder = orderRepository.save(order);
+
     return OrderResponse.toOrder(savedOrder);
   }
 
-  private static List<Product> findProductByDuplicateProductNumber(List<Product> dbProducts,
-    List<String> requestProductNumbers) {
-    // 반복문으로 할 경우
-//    List<Product> orderProduct = new ArrayList<>();
-//    if(dbProducts.size() != productNumbers.size()){
-//
-//      for (String productNumber : productNumbers) {
-//        for (Product product : dbProducts) {
-//          if (product.getProductNumber().equals(productNumber)) {
-//            orderProduct.add(product);
-//            break;
-//          }
-//        }
-//      }
-//    }
+  /**
+   * 상품 조회, 실제 구매할 수 있는 상품인지 체크
+   * @param requestProducts : {001, 001, 002}
+   * @return
+   */
+  private List<Product> findProductsBy(
+    List<String> requestProducts
+  ) {
+    // 상품 코드를 가지고 DB에서 주문한 상품 정보 가져옴
+    List<Product> dbProducts = productRepository.findAllByProductNumberIn(requestProducts);
 
+    // 상품코드를 key값으로
+    Map<String, Product> productMap = dbProducts.stream()
+      .collect(Collectors.toMap(Product::getProductNumber, p -> p));
 
-    // DB 상품들을 productNumber 기준으로 Map으로 변환
-    // "A001"	[Product("A001", 1000), Product("A001", 1000)]
-    // "B002"	[Product("B002", 1500)]
-    Map<String, List<Product>> dbProductMap = dbProducts.stream()
-      .collect(Collectors.groupingBy(Product::getProductNumber));
-
-    // 요청한 상품들을 DB 상품들과 비교해서 Map으로 반환
-    // [Product("A001", 1000),Product("A001", 1000),Product("B002", 1500)]
-    List<Product> orderedProducts = requestProductNumbers.stream()
-      .flatMap(productNumber -> {
-        // DB에서 해당 상품 주문 번호로 상품들 가져와서
-        List<Product> productList = dbProductMap.get(productNumber);
-
-        // 사용자가 요청한 상품 번호와 DB의 상품 번호중 맞지 않는 경우가 있을때
-        if (productList == null) {
-          throw new IllegalArgumentException(
-            "존재하지 않는 상품 번호입니다: " + productNumber
-          );
+    // 요청 상품들에 DB에서 가져온 상품 정보를 넘겨줌
+    return requestProducts.stream()
+      .map(productNumber -> {
+        Product product = productMap.get(productNumber);
+        if (product == null) {
+          throw new IllegalArgumentException("존재하지 않는 상품 번호입니다: " + productNumber);
         }
-        return productList.stream();
+        return product;
       })
       .collect(Collectors.toList());
-    return orderedProducts;
   }
 
+  /**
+   * 재고 차감
+   * @param products
+   * @param productNumbers
+   */
+  private void deductStockQuantities(List<Product> products) {
+    // 1. 재고 차감이 필요한 상품 번호 추출 ex) 병 음료, 베이커리
+    List<String> productsToDeductStock = extractStockProductNumbers(products);
+
+    // 2. 재고 엔티티 조회
+    List<Stock> dbStocks = stockRepository.findAllByProductNumberIn(productsToDeductStock);
+    Map<String, Stock> sbStockMap = dbStocks.stream()
+      .collect(Collectors.toMap(Stock::getProductNumber, s -> s));
+
+    // 3. 상품별 주문 수량 계산 ex) {A101=3, A102=2, A103=1}
+    Map<String, Long> productCountMap = productsToDeductStock.stream()
+      .collect(Collectors.groupingBy(p -> p, Collectors.counting()));
+
+    // 4. 재고 차감
+    for (Map.Entry<String, Long> entry : productCountMap.entrySet()) {
+      String productNumber = entry.getKey();
+      int quantity = entry.getValue().intValue();
+
+      Stock stock = sbStockMap.get(productNumber);
+      if (stock == null || stock.isQuantityLessThanRequestQuantity(quantity)) {
+        throw new IllegalArgumentException("재고가 부족한 상품이 있습니다.");
+      }
+      stock.deductQuantity(quantity);
+    }
+  }
+
+  private List<String> extractStockProductNumbers(List<Product> products) {
+    return products.stream()
+      .filter(product -> ProductType.containsStockType(product.getType()))
+      .map(Product::getProductNumber)
+      .collect(Collectors.toList());
+  }
 }
