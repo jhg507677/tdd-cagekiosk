@@ -1,4 +1,4 @@
-package com.codingcat.cafekiosk.api.service.product.dto;
+package com.codingcat.cafekiosk.domain.product.dto;
 
 import com.codingcat.cafekiosk.domain.product.Product;
 import com.codingcat.cafekiosk.domain.product.ProductSellingStatus;

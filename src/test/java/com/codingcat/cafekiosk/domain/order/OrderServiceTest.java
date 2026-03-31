@@ -1,14 +1,12 @@
-package com.codingcat.cafekiosk.api.service.order;
+package com.codingcat.cafekiosk.domain.order;
 
 import static com.codingcat.cafekiosk.domain.product.ProductSellingStatus.SELLING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
-import com.codingcat.cafekiosk.api.service.order.dto.OrderCreateRequest;
-import com.codingcat.cafekiosk.api.service.order.dto.OrderResponse;
-import com.codingcat.cafekiosk.domain.order.OrderProductRepository;
-import com.codingcat.cafekiosk.domain.order.OrderRepository;
+import com.codingcat.cafekiosk.domain.order.dto.OrderCreateRequest;
+import com.codingcat.cafekiosk.domain.order.dto.OrderResponse;
 import com.codingcat.cafekiosk.domain.product.Product;
 import com.codingcat.cafekiosk.domain.product.ProductRepository;
 import com.codingcat.cafekiosk.domain.product.ProductType;
@@ -22,21 +20,22 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 @ActiveProfiles("test")
 @SpringBootTest
 class OrderServiceTest {
-  @Autowired OrderService orderService;
+  @Autowired
+  OrderService orderService;
   @Autowired ProductRepository productRepository;
   @Autowired OrderRepository orderRepository;
-  @Autowired OrderProductRepository orderProductRepository;
+  @Autowired
+  OrderItemRepository orderItemRepository;
   @Autowired StockRepository stockRepository;
 
   // 하나의 테스트는 다른 테스트에 영향 받지 않게
   @AfterEach
   void tearDown() {
-    orderProductRepository.deleteAllInBatch();
+    orderItemRepository.deleteAllInBatch();
     productRepository.deleteAllInBatch();
     orderRepository.deleteAllInBatch();
     stockRepository.deleteAllInBatch();

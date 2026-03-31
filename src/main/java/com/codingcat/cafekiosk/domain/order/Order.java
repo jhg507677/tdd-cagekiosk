@@ -1,7 +1,7 @@
 package com.codingcat.cafekiosk.domain.order;
 
 import com.codingcat.cafekiosk.domain.BaseEntity;
-import com.codingcat.cafekiosk.domain.orderproduct.OrderProduct;
+import com.codingcat.cafekiosk.domain.orderproduct.OrderItem;
 import com.codingcat.cafekiosk.domain.product.Product;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,27 +39,50 @@ public class Order extends BaseEntity {
   // 주문 하나에 상품은 여러개
   // 주문 테이블 삭제시 주문 아이템들 모두 삭제
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-  private List<OrderProduct> orderProducts= new ArrayList<>();
+  private List<OrderItem> orderItems = new ArrayList<>();
 
   // Order 생성시 가격 계산
   // 각각의 단위 테스트 필요
   // registeredDateTime 같은 경우 단위 테스트를 위해 파라미터로 빼야함
-  public Order(List<Product> products, LocalDateTime registeredDateTime){
-    this.orderStatus = OrderStatus.INIT;
-    this.totalPrice = calculateTotalPrice(products);
-    this.registeredDateTime = registeredDateTime;
-    this.orderProducts = products.stream()
-      .map(product -> new OrderProduct(this, product))
-      .collect(Collectors.toList());
-  }
 
-  public static Order create(List<Product> products, LocalDateTime registeredDateTime) {
-    return new Order(products, registeredDateTime);
+  public static Order create(
+    List<Product> products, LocalDateTime registeredDateTime
+  ) {
+    return Order.builder()
+      .orderStatus(OrderStatus.INIT)
+      .products(products)
+      .registeredDateTime(registeredDateTime)
+      .build();
   }
 
   private int calculateTotalPrice(List<Product> products) {
     return products.stream()
       .mapToInt(Product::getPrice)
       .sum();
+  }
+
+  @Builder
+  public Order(
+    OrderStatus orderStatus,
+    LocalDateTime registeredDateTime,
+    List<Product> products
+  ) {
+    this.totalPrice = calculateTotalPrice(products);
+    this.orderStatus = orderStatus;
+    this.registeredDateTime = registeredDateTime;
+
+    // 상품들을 주문 상품으로 변경
+    this.orderItems = products.stream()
+      .map(product -> new OrderItem(this, product))
+      .collect(Collectors.toList());
+  }
+
+  @Builder
+  public Order(OrderStatus orderStatus, int totalPrice, LocalDateTime registeredDateTime,
+    List<OrderItem> orderItems) {
+    this.orderStatus = orderStatus;
+    this.totalPrice = totalPrice;
+    this.registeredDateTime = registeredDateTime;
+    this.orderItems = orderItems;
   }
 }

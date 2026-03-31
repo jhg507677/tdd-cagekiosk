@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-@EnableJpaAuditing
+
 @SpringBootApplication // 스프링 부트 사용에 필요한 기본설정
 public class CafekioskApplication {
 

@@ -1,9 +1,7 @@
-package com.codingcat.cafekiosk.api.service.order;
+package com.codingcat.cafekiosk.domain.order;
 
-import com.codingcat.cafekiosk.api.service.order.dto.OrderCreateRequest;
-import com.codingcat.cafekiosk.api.service.order.dto.OrderResponse;
-import com.codingcat.cafekiosk.domain.order.Order;
-import com.codingcat.cafekiosk.domain.order.OrderRepository;
+import com.codingcat.cafekiosk.domain.order.dto.OrderCreateRequest;
+import com.codingcat.cafekiosk.domain.order.dto.OrderResponse;
 import com.codingcat.cafekiosk.domain.product.Product;
 import com.codingcat.cafekiosk.domain.product.ProductRepository;
 import com.codingcat.cafekiosk.domain.product.ProductType;
@@ -19,12 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class OrderService {
   private final ProductRepository productRepository;
   private final OrderRepository orderRepository;
   private final StockRepository stockRepository;
 
+  @Transactional
   public OrderResponse createOrder(
     OrderCreateRequest request, LocalDateTime registeredDateTime
   ) {
@@ -75,6 +74,7 @@ public class OrderService {
    * @param products
    * @param productNumbers
    */
+  @Transactional
   private void deductStockQuantities(List<Product> products) {
     // 1. 재고 차감이 필요한 상품 번호 추출 ex) 병 음료, 베이커리
     List<String> productsToDeductStock = extractStockProductNumbers(products);

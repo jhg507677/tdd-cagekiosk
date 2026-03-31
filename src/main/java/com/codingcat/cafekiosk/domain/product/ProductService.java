@@ -1,16 +1,15 @@
-package com.codingcat.cafekiosk.api.service.product;
+package com.codingcat.cafekiosk.domain.product;
 
-import com.codingcat.cafekiosk.api.service.product.dto.CreateProductRequest;
-import com.codingcat.cafekiosk.api.service.product.dto.ProductResponse;
-import com.codingcat.cafekiosk.domain.product.Product;
-import com.codingcat.cafekiosk.domain.product.ProductRepository;
-import com.codingcat.cafekiosk.domain.product.ProductSellingStatus;
+import com.codingcat.cafekiosk.domain.product.dto.CreateProductRequest;
+import com.codingcat.cafekiosk.domain.product.dto.ProductResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class ProductService {
@@ -25,6 +24,7 @@ public class ProductService {
   }
 
   // 상품 생성
+  @Transactional
   public ProductResponse createProduct(CreateProductRequest request) {
     // productNumber 생성
     // DB에서 마지막 저장된 product의 상품 번호를 읽어와서 + 1

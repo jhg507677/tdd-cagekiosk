@@ -9,14 +9,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Table(name="order_item")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class OrderProduct extends BaseEntity {
+public class OrderItem extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -27,7 +29,7 @@ public class OrderProduct extends BaseEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   private Product product;
 
-  public OrderProduct(Order order, Product product) {
+  public OrderItem(Order order, Product product) {
     this.order = order;
     this.product = product;
   }

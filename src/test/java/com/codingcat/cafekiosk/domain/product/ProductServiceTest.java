@@ -1,13 +1,13 @@
-package com.codingcat.cafekiosk.api.service.product;
+package com.codingcat.cafekiosk.domain.product;
 
 import static com.codingcat.cafekiosk.domain.product.ProductSellingStatus.HOLD;
 import static com.codingcat.cafekiosk.domain.product.ProductSellingStatus.SELLING;
 import static com.codingcat.cafekiosk.domain.product.ProductSellingStatus.STOP_SELLING;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-import com.codingcat.cafekiosk.api.service.product.dto.CreateProductRequest;
-import com.codingcat.cafekiosk.api.service.product.dto.ProductResponse;
+import com.codingcat.cafekiosk.domain.product.ProductService;
+import com.codingcat.cafekiosk.domain.product.dto.CreateProductRequest;
+import com.codingcat.cafekiosk.domain.product.dto.ProductResponse;
 import com.codingcat.cafekiosk.domain.product.Product;
 import com.codingcat.cafekiosk.domain.product.ProductRepository;
 import com.codingcat.cafekiosk.domain.product.ProductSellingStatus;

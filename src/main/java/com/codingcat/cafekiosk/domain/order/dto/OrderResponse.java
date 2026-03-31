@@ -1,6 +1,6 @@
-package com.codingcat.cafekiosk.api.service.order.dto;
+package com.codingcat.cafekiosk.domain.order.dto;
 
-import com.codingcat.cafekiosk.api.service.product.dto.ProductResponse;
+import com.codingcat.cafekiosk.domain.product.dto.ProductResponse;
 import com.codingcat.cafekiosk.domain.order.Order;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,7 +30,7 @@ public class OrderResponse {
       .totalPrice(order.getTotalPrice())
       .registeredDateTime(order.getRegisteredDateTime())
 
-      .products(order.getOrderProducts().stream()
+      .products(order.getOrderItems().stream()
         .map(product -> ProductResponse.of(product.getProduct()))
         .collect(Collectors.toList())
       )
