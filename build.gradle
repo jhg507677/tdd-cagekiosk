@@ -36,10 +36,11 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Tests
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+
+    // Tests
+    testImplementation 'org.springframework.boot:spring-boot-starter-test' // junit5, assertj
     implementation 'org.junit.platform:junit-platform-launcher:1.10.0'
 
     // etc

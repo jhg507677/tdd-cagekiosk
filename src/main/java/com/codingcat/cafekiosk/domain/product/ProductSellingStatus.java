@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+// 판매 상태
 @Getter
 @RequiredArgsConstructor
 public enum ProductSellingStatus {

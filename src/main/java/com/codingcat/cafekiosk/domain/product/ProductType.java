@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/*상품 타입*/
 @Getter
 @RequiredArgsConstructor
 public enum ProductType {

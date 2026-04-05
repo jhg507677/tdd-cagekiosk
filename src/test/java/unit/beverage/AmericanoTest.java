@@ -1,21 +1,27 @@
-package com.codingcat.cafekiosk.unit.beverage;
+package unit.beverage;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Test;
-
 class AmericanoTest {
+  
+  @DisplayName("")
   @Test
   void getName(){
     Americano americano = new Americano();
-    assertEquals(americano.getName(), "아메리카노");
+
+    // assertEquals(americano.getName(),"아메리카노");
     assertThat(americano.getName()).isEqualTo("아메리카노");
   }
-
+  
+  @DisplayName("")
   @Test
   void getPrice(){
     Americano americano = new Americano();
     assertThat(americano.getPrice()).isEqualTo(4000);
   }
+  
 }

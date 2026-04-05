@@ -14,10 +14,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProductService {
   private final ProductRepository productRepository;
-
+  
   // 상품 조회
   public List<ProductResponse> getSellingProducts(){
+    // 판매 노출 상태의 상품 조회
     List<Product> products = productRepository.findAllBySellingStatusIn(ProductSellingStatus.forDisplay());
+    
     return products.stream()
       .map(ProductResponse::of)
       .collect(Collectors.toList());

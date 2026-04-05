@@ -11,7 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 /*공통 엔티티 필드를 자동으로 관리하기 위한 베이스 클래스*/
 @Getter
 @MappedSuperclass // 이 클래스를 상속한 엔티티는 이 클래스의 필드를 자기 컬럼처럼 가짐
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class) // AuditingEntityListener가 @CreatedDate, @LastModifiedDate 이벤트 감지
 public abstract class BaseEntity {
   @CreatedDate
   private LocalDateTime createdDateTime;

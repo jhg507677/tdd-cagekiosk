@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
   /*** SELECT * FROM WHERE selling_status IN ("SELLING","HOLD");*/
+  // 판매 상태 별 상품 조회
   List<Product> findAllBySellingStatusIn(List<ProductSellingStatus> sellingStatuses);
 
   /*** SELECT * FROM WHERE product_number IN (입력값들);*/
